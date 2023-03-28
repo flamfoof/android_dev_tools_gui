@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "(Windows) Launch",
+        "type": "cppvsdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}\\out\\electron.exe",
+        "args": "${workspaceFolder}",
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [
+            {"name": "ELECTRON_ENABLE_LOGGING", "value": "true"},
+            {"name": "ELECTRON_ENABLE_STACK_DUMPING", "value": "true"},
+            {"name": "ELECTRON_RUN_AS_NODE", "value": ""},
+        ],
+        "externalConsole": false,
+        "sourceFileMap": {
+            "o:\\": "${workspaceFolder}",
+        },
+      },
+    ]
+  }

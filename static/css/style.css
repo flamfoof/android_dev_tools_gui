@@ -1,0 +1,29 @@
+#section {
+    display: block;
+    border-radius: 1px;
+    border-style: solid;
+    border-color: rgb(201, 231, 255);
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 10px;
+}
+
+#info {
+    display: block;
+
+}
+
+textarea {
+    background: #6dacff;
+    resize: none;
+}
+
+textarea.connected {
+    background: #b8ffbe;
+    resize: none;
+}
+
+textarea.disconnected {
+    background: #ffbaba;
+    resize: none;
+}

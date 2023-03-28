@@ -1,0 +1,24 @@
+{
+	"name": "Android Dev Tool",
+	"version": "1.0.0",
+	"description": "Electron app for installing APKs using ADB",
+	"main": "index.js",
+	"scripts": {
+		"start": "electron ."
+	},
+	"keywords": [
+		"electron",
+		"adb",
+		"install",
+		"apk"
+	],
+	"build": {
+		"productName": "Android Dev Tool",
+		"win": {
+			"target": "portable"
+		}
+	},
+	"dependencies": {
+		"electron": "^23.2.0"
+	}
+}
