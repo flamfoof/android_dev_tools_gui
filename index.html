@@ -9,15 +9,11 @@
         <div id="section">
             <p>Connection</p>
             <label for="deviceField">Devices:</label>
-            <textarea id="deviceField" rows="2" cols="50" readonly>
-No devices
-            </textarea>
+            <textarea id="deviceField" rows="2" cols="50" readonly>No devices</textarea>
             <br />
             <br />
             <label for="deviceStatusField">Status:</label>
-            <textarea id="deviceStatusField" rows="3" cols="50" readonly>
-Chilling
-            </textarea>
+            <textarea id="deviceStatusField" rows="3" cols="50" readonly>Chilling</textarea>
             <br />
             <br />
             <label for="deviceFieldIP">Device:</label>
@@ -28,19 +24,11 @@ Chilling
         <div id="section">
             <p>Application</p>
             <label for="directoryField">APK directory:</label>
-            <textarea id="directoryField" rows="1" cols="35" readonly>
-I'm lost, point me somewhere ->
-            </textarea>
+            <textarea id="directoryField" rows="1" cols="35" readonly>I'm lost, point me somewhere -></textarea>
             <button id="directoryButton">Browse</button>
             <p></p>
             <label for="packageField">APK Package Name:</label>
-            <input
-                type="text"
-                id="packageField"
-                rows="1"
-                cols="30"
-                value="com.freecast.watch"
-            />
+            <input type="text" id="packageField" rows="1" cols="30" value="com.your.apk" />
             <br />
             <br />
             <button id="installButton">Install APK</button>
@@ -50,9 +38,7 @@ I'm lost, point me somewhere ->
             <button id="uninstallButton">Uninstall APK</button>
             <p></p>
             <label for="installStatusField">Result:</label>
-            <textarea id="installStatusField" rows="5" cols="60" readonly>
- Not much is happening at the moment
-            </textarea>
+            <textarea id="installStatusField" rows="5" cols="60" readonly>Not much is happening at the moment</textarea>
         </div>
         <div id="section">
             <p>Type</p>
@@ -96,9 +82,7 @@ I'm lost, point me somewhere ->
             }
 
             connectButton.addEventListener("click", () => {
-                document.getElementById(
-                    "deviceStatusField"
-                ).value = `Running...`
+                document.getElementById("deviceStatusField").value = `Running...`
                 ipcRenderer.send("connectDevice", deviceInput.value)
             })
 
