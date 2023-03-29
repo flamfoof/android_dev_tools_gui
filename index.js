@@ -59,126 +59,88 @@ async function checkDevices() {
     let defaultMessage;
     let deviceModel;
 
-    cp.spawnSync(`adb devices`, (error, stdout, stderr) => {
-        if (error) {
-            mainWindow.webContents.send(
-                "updateDeviceUnitStatus",
-                `No devices found :(`
-            );
-            return;
-        }
-        if (stderr) {
-            mainWindow.webContents.send(
-                "updateDeviceUnitStatus",
-                `No devices found :(`
-            );
-            return;
-        }
-        // console.log("defaulted?")
-        defaultMessage = stdout;
+    let getConnectedDevice = cp.spawn(`adb`, ["devices"]);
 
-        cp.spawnSync(
-            `adb shell ip addr show wlan0 | findstr /r /c:"inet.*[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*" | for /f "tokens=2" %a in ('more') do @echo %a`,
-            (error, stdout, stderr) => {
-                if (error) {
-                    mainWindow.webContents.send(
-                        "updateDeviceUnitStatus",
-                        `No devices found :(`
-                    );
-                    return;
-                }
-                if (stderr) {
-                    mainWindow.webContents.send(
-                        "updateDeviceUnitStatus",
-                        `No devices found :(`
-                    );
-                    return;
-                }
-                // console.log("got ip")
-                deviceIP = stdout.slice(0, stdout.indexOf("/"));
-
-                cp.spawnSync(
-                    `adb -s ${deviceIP} shell getprop ro.product.model  `,
-                    (error, stdout, stderr) => {
-                        if (error) {
-                            mainWindow.webContents.send(
-                                "updateDeviceUnitStatus",
-                                `No devices found :(`
-                            );
-                            return;
-                        }
-                        if (stderr) {
-                            mainWindow.webContents.send(
-                                "updateDeviceUnitStatus",
-                                `No devices found :(`
-                            );
-                            return;
-                        }
-
-                        deviceModel = stdout;
-                        // console.log("Got model")
-
-                        if (deviceIP != null || deviceModel != null) {
-                            mainWindow.webContents.send(
-                                "updateDeviceUnitStatus",
-                                `Connected to: ${deviceModel} as "${deviceIP}"`
-                            );
-                        } else {
-                            mainWindow.webContents.send(
-                                "updateDeviceUnitStatus",
-                                `${defaultMessage}`
-                            );
-                        }
-                    }
-                );
-            }
+    getConnectedDevice.stderr.on("data", (data) => {
+        mainWindow.webContents.send(
+            "updateDeviceUnitStatus",
+            `No devices found :(`
         );
+    });
+
+    getConnectedDevice.stdout.on("data", (data) => {
+        defaultMessage = data.toString();
+        forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel);
+        let getDeviceIP = cp.spawn(
+            `adb`,
+            "shell ip addr show wlan0".split(" ")
+        );
+
+        getDeviceIP.stdout.on("data", (data) => {
+			try {
+				deviceIP = data.toString().split("inet ")[1].split("/")[0];
+			} catch(e) {
+				console.log("There are valid IP addresses")
+			}
+
+            let getDeviceModel = cp.spawn(
+                `adb`,
+                `-s ${deviceIP} shell getprop ro.product.model`.split(" ")
+            );
+
+            getDeviceModel.stdout.on("data", (data) => {
+                deviceModel = data.toString();
+                forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel);
+            });
+        });
     });
 }
 
+function forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel) {
+    if (deviceIP != null || deviceModel != null) {
+        mainWindow.webContents.send(
+            "updateDeviceUnitStatus",
+            `Connected to: ${deviceModel} as "${deviceIP}"`
+        );
+    } else {
+        mainWindow.webContents.send(
+            "updateDeviceUnitStatus",
+            `${defaultMessage}`
+        );
+    }
+}
+
 async function connectDevice(deviceIPAddress) {
-    cp.spawnSync(`adb connect ${deviceIPAddress}`, (error, stdout, stderr) => {
-        if (error) {
-            mainWindow.webContents.send("updateDeviceStatus", `${error}`);
-            return;
-        }
-        if (stderr) {
-            mainWindow.webContents.send("updateDeviceStatus", `${stderr}`);
-            return;
-        }
-        mainWindow.webContents.send("updateDeviceStatus", `${stdout}`);
+    let connect = cp.spawn(`adb`, `connect ${deviceIPAddress}`.split(" "));
+    connect.stderr.on("data", (data) => {
+        mainWindow.webContents.send("updateDeviceStatus", `${data}`);
+    });
+    connect.stdout.on("data", (data) => {
+        mainWindow.webContents.send("updateDeviceStatus", `${data}`);
         deviceIP = deviceIPAddress;
         checkDevices();
     });
 }
 
 async function disconnectDevice() {
-    cp.spawnSync(`adb disconnect`, (error, stdout, stderr) => {
-        if (error) {
-            mainWindow.webContents.send("updateDeviceStatus", `${error}`);
-            return;
-        }
-        if (stderr) {
-            mainWindow.webContents.send("updateDeviceStatus", `${stderr}`);
-            return;
-        }
-        mainWindow.webContents.send("updateDeviceStatus", `${stdout}`);
+    let disconnect = cp.spawn(`adb`, `disconnect ${deviceIP}`.split(" "));
+    disconnect.stderr.on("data", (data) => {
+        mainWindow.webContents.send("updateDeviceStatus", `${data}`);
+    });
+    disconnect.stdout.on("data", (data) => {
+        mainWindow.webContents.send("updateDeviceStatus", `${data}`);
         deviceIP = null;
         checkDevices();
     });
 }
 
 async function installApk(apkPath) {
-    cp.spawnSync(`adb install "${apkPath}"`, (error, stdout, stderr) => {
-        if (error) {
-            mainWindow.webContents.send("updateInstallStatus", `${error}`);
-            return;
-        }
-        if (stderr) {
-            mainWindow.webContents.send("updateInstallStatus", `${stderr}`);
-            return;
-        }
-        mainWindow.webContents.send("updateInstallStatus", `${stdout}`);
+    let install = cp.spawn(`adb`, `install ${apkPath}`.split(" "));
+    install.stderr.on("data", (data) => {
+        mainWindow.webContents.send("updateInstallStatus", `${data}`);
+    });
+    install.stdout.on("data", (data) => {
+        mainWindow.webContents.send("updateInstallStatus", `${data}`);
     });
 }
 
@@ -208,90 +170,79 @@ function openFileDialog() {
 }
 
 async function startApk(apkPackage) {
-    cp.spawnSync(
-        `adb shell monkey -p "${apkPackage}" -c android.intent.category.LEANBACK_LAUNCHER 1`,
-        (error, stdout, stderr) => {
-            if (error || stderr) {
-                cp.spawnSync(
-                    `adb shell monkey -p "${apkPackage}" -c android.intent.category.LAUNCHER 1`,
-                    (error, stdout, stderr) => {
-                        if (error || stderr) {
-                            mainWindow.webContents.send(
-                                "updateInstallStatus",
-                                `${stderr}`
-                            );
-                            return;
-                        }
-                        mainWindow.webContents.send(
-                            "updateInstallStatus",
-                            `${stdout}`
-                        );
-                    }
-                );
-                mainWindow.webContents.send("updateInstallStatus", `${stderr}`);
-                return;
-            }
-            mainWindow.webContents.send("updateInstallStatus", `${stdout}`);
-        }
+    let success = false;
+    let start = cp.spawn(
+        `adb`,
+        `shell monkey -p ${apkPackage} -c android.intent.category.LEANBACK_LAUNCHER 1`.split(" ")
     );
+    start.stderr.on("data", (data) => {
+        if (!success) {
+            let altStart = cp.spawn(
+                `adb`,
+                `shell monkey -p ${apkPackage} -c android.intent.category.LAUNCHER 1`.split(" ")
+            );
+            altStart.stderr.on("data", (data) => {
+                if (!success)
+                    mainWindow.webContents.send(
+                        "updateInstallStatus",
+                        `${data}`
+                    );
+            });
+
+            altStart.stdout.on("data", (data) => {
+				mainWindow.webContents.send(
+					"updateInstallStatus",
+					`${data}`
+				);
+                success = true;
+            });
+        }
+    });
+    start.stdout.on("data", (data) => {
+		mainWindow.webContents.send("updateInstallStatus", `${data}`);
+        success = true;
+		if(data.includes("aborted")) {
+			success = false;
+			start.stderr.push("aborted")
+		}
+    });
 }
 
 async function stopApk(apkPackage) {
-    cp.spawnSync(
-        `adb shell am force-stop ${apkPackage}"`,
-        (error, stdout, stderr) => {
-            if (error) {
-                mainWindow.webContents.send("updateInstallStatus", `${error}`);
-                return;
-            }
-            if (stderr) {
-                mainWindow.webContents.send("updateInstallStatus", `${stderr}`);
-                return;
-            }
-            mainWindow.webContents.send("updateInstallStatus", `${stdout}`);
-        }
-    );
+    let stop = cp.spawn(`adb`, `shell am force-stop ${apkPackage}`.split(" "));
+    stop.stderr.on("data", (data) => {
+        mainWindow.webContents.send("updateInstallStatus", `${data}`);
+    });
+    stop.stdout.on("data", (data) => {
+        mainWindow.webContents.send("updateInstallStatus", `${data}`);
+    });
 }
 
 async function clearApk(apkPackage) {
-    cp.spawnSync(
-        `adb shell pm clear ${apkPackage}`,
-        (error, stdout, stderr) => {
-            if (error) {
-                mainWindow.webContents.send("updateInstallStatus", `${error}`);
-                return;
-            }
-            if (stderr) {
-                mainWindow.webContents.send("updateInstallStatus", `${stderr}`);
-                return;
-            }
-            mainWindow.webContents.send("updateInstallStatus", `${stdout}`);
-        }
-    );
+    let clear = cp.spawn(`adb`, `shell pm clear ${apkPackage}`.split(" "));
+    clear.stderr.on("data", (data) => {
+        mainWindow.webContents.send("updateInstallStatus", `${data}`);
+    });
+    clear.stdout.on("data", (data) => {
+        mainWindow.webContents.send("updateInstallStatus", `${data}`);
+    });
 }
 
 async function uninstallApk(apkPackage) {
-    cp.spawnSync(`adb uninstall ${apkPackage}`, (error, stdout, stderr) => {
-        if (error) {
-            mainWindow.webContents.send("updateInstallStatus", `${error}`);
-            return;
-        }
-        if (stderr) {
-            mainWindow.webContents.send("updateInstallStatus", `${stderr}`);
-            return;
-        }
-        mainWindow.webContents.send("updateInstallStatus", `${stdout}`);
+    let uninstall = cp.spawn(`adb`, `uninstall ${apkPackage}`.split(" "));
+    uninstall.stderr.on("data", (data) => {
+        mainWindow.webContents.send("updateInstallStatus", `${data}`);
+    });
+    uninstall.stdout.on("data", (data) => {
+        mainWindow.webContents.send("updateInstallStatus", `${data}`);
     });
 }
 
 async function typeTextAction(inputText) {
-    cp.spawnSync(
-        `adb shell input text ${inputText}`,
-        (error, stdout, stderr) => {}
-    );
-    mainWindow.webContents.send("updateTypeInputField");
+    let typing = cp.spawn(`adb`, `shell input text ${inputText}`.split(" "));
+	mainWindow.webContents.send("updateTypeInputField");
 }
 
 async function backspaceAction() {
-    cp.spawnSync(`adb shell input keyevent 67`, (error, stdout, stderr) => {});
+    let backspace = cp.spawn(`adb`, `shell input keyevent 67`.split(" "));
 }
