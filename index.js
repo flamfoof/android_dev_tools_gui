@@ -80,7 +80,7 @@ async function checkDevices() {
 			try {
 				deviceIP = data.toString().split("inet ")[1].split("/")[0];
 			} catch(e) {
-				console.log("There are valid IP addresses")
+				console.log("There are no valid IP addresses")
 			}
 
             let getDeviceModel = cp.spawn(
@@ -239,10 +239,10 @@ async function uninstallApk(apkPackage) {
 }
 
 async function typeTextAction(inputText) {
-    let typing = cp.spawn(`adb`, `shell input text ${inputText}`.split(" "));
+    cp.spawn(`adb`, `shell input text ${inputText}`.split(" "));
 	mainWindow.webContents.send("updateTypeInputField");
 }
 
 async function backspaceAction() {
-    let backspace = cp.spawn(`adb`, `shell input keyevent 67`.split(" "));
+    cp.spawn(`adb`, `shell input keyevent 67`.split(" "));
 }
