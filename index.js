@@ -62,10 +62,7 @@ async function checkDevices() {
     const getConnectedDevice = cp.spawn(`adb`, ["devices"])
 
     getConnectedDevice.stderr.on("data", (data) => {
-        mainWindow.webContents.send(
-            "updateDeviceUnitStatus",
-            `No devices found :(`
-        )
+        mainWindow.webContents.send("updateDeviceUnitStatus", `No devices found :(`)
     })
 
     getConnectedDevice.stdout.on("data", (data) => {
@@ -80,10 +77,7 @@ async function checkDevices() {
                 console.log("There are no valid IP addresses")
             }
 
-            const getDeviceModel = cp.spawn(
-                `adb`,
-                `-s ${deviceIP} shell getprop ro.product.model`.split(" ")
-            )
+            const getDeviceModel = cp.spawn(`adb`, `-s ${deviceIP} shell getprop ro.product.model`.split(" "))
 
             getDeviceModel.stdout.on("data", (data) => {
                 deviceModel = data.toString()
@@ -95,15 +89,9 @@ async function checkDevices() {
 
 function forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel) {
     if (deviceIP != null || deviceModel != null) {
-        mainWindow.webContents.send(
-            "updateDeviceUnitStatus",
-            `Connected to: ${deviceModel} as "${deviceIP}"`
-        )
+        mainWindow.webContents.send("updateDeviceUnitStatus", `Connected to: ${deviceModel} as "${deviceIP}"`)
     } else {
-        mainWindow.webContents.send(
-            "updateDeviceUnitStatus",
-            `${defaultMessage}`
-        )
+        mainWindow.webContents.send("updateDeviceUnitStatus", `${defaultMessage}`)
     }
 }
 
@@ -159,10 +147,7 @@ function openFileDialog() {
             }
         })
         .catch((err) => {
-            mainWindow.webContents.send(
-                "updateInstallStatus",
-                `Error opening file dialog: ${err.message}`
-            )
+            mainWindow.webContents.send("updateInstallStatus", `Error opening file dialog: ${err.message}`)
         })
 }
 
@@ -170,24 +155,16 @@ async function startApk(apkPackage) {
     let success = false
     const start = cp.spawn(
         `adb`,
-        `shell monkey -p ${apkPackage} -c android.intent.category.LEANBACK_LAUNCHER 1`.split(
-            " "
-        )
+        `shell monkey -p ${apkPackage} -c android.intent.category.LEANBACK_LAUNCHER 1`.split(" ")
     )
     start.stderr.on("data", (data) => {
         if (!success) {
             const altStart = cp.spawn(
                 `adb`,
-                `shell monkey -p ${apkPackage} -c android.intent.category.LAUNCHER 1`.split(
-                    " "
-                )
+                `shell monkey -p ${apkPackage} -c android.intent.category.LAUNCHER 1`.split(" ")
             )
             altStart.stderr.on("data", (data) => {
-                if (!success)
-                    mainWindow.webContents.send(
-                        "updateInstallStatus",
-                        `${data}`
-                    )
+                if (!success) mainWindow.webContents.send("updateInstallStatus", `${data}`)
             })
 
             altStart.stdout.on("data", (data) => {
