@@ -1,28 +1,29 @@
 {
-	"name": "Android Dev Tool",
-	"version": "1.0.0",
-	"description": "Electron app for installing APKs using ADB",
-	"main": "index.js",
-	"scripts": {
-		"start": "electron ."
-	},
-	"keywords": [
-		"electron",
-		"adb",
-		"install",
-		"apk"
-	],
-	"build": {
-		"productName": "Android Dev Tool",
-		"win": {
-			"target": "portable"
-		}
-	},
-	"dependencies": {
-		"electron": "^23.2.0"
-	},
-	"devDependencies": {
-		"eslint": "^8.37.0",
-		"eslint-config-google": "^0.14.0"
-	}
+    "name": "Android Dev Tool",
+    "version": "1.0.0",
+    "description": "Electron app for installing APKs using ADB",
+    "main": "index.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "keywords": [
+        "electron",
+        "adb",
+        "install",
+        "apk"
+    ],
+    "build": {
+        "productName": "Android Dev Tool",
+        "win": {
+            "target": "portable"
+        }
+    },
+    "dependencies": {
+        "electron": "^23.2.0",
+        "eslint-config-prettier": "^8.8.0"
+    },
+    "devDependencies": {
+        "eslint": "^8.37.0",
+        "eslint-config-google": "^0.14.0"
+    }
 }
