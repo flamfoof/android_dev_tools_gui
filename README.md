@@ -14,7 +14,7 @@ It has the following features
 
 Instructions
 1. Install npm packages with ```npm install```
-2. Build electron app with ```electron .```
+2. Run electron app with ```electron .```
 3. Build for platform by:
   
   Windows - ```electron-packager . MyAppName --platform=win32 --arch=x64 --icon=path/to/icon.ico --out=path/to/output/folder --overwrite```
