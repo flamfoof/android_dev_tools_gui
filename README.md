@@ -16,8 +16,7 @@ Instructions
 1. Install npm packages with ```npm install```
 2. Build electron app with ```electron .```
 3. Build for platform by:
-``` Windows - 'electron-packager . MyAppName --platform=win32 --arch=x64 --icon=path/to/icon.ico --out=path/to/output/folder --overwrite
-  Mac - 'electron-packager . --overwrite --platform=darwin --arch=x64 --prune=true --out=release-builds' 
-```
+  Windows - ```electron-packager . MyAppName --platform=win32 --arch=x64 --icon=path/to/icon.ico --out=path/to/output/folder --overwrite```
+  Mac - ```electron-packager . --overwrite --platform=darwin --arch=x64 --prune=true --out=release-builds ```
 
 Hope you all like the tool I made and I hope it is useful to everyone!
