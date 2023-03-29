@@ -1,163 +1,211 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Android QA Tool</title>
+        <link href="static/css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <div id="section">
+            <p>Connection</p>
+            <label for="deviceField">Devices:</label>
+            <textarea
+                id="deviceField"
+                rows="2"
+                cols="50"
+                readonly
+            >
+                No devices
+            </textarea
+            >
+            <br>
+            <br>
+            <label for="deviceStatusField">Status:</label>
+            <textarea
+                id="deviceStatusField"
+                rows="3"
+                cols="50"
+                readonly
+            >
+                Chilling
+            </textarea
+            >
+            <br>
+            <br>
+            <label for="deviceFieldIP">Device:</label>
+            <input
+                type="text"
+                id="deviceFieldIP"
+                rows="1"
+                cols="30"
+            >
+            <button id="connectButton">Connect</button>
+            <button id="disconnectButton">Disconnect</button>
+        </div>
+        <div id="section">
+            <p>Application</p>
+            <label for="directoryField">APK directory:</label>
+            <textarea
+                id="directoryField"
+                rows="1"
+                cols="30"
+                readonly
+            >
+                I'm lost, point me somewhere ->
+            </textarea
+            >
+            <button id="directoryButton">Browse</button>
+            <p></p>
+            <label for="packageField">APK Package Name:</label>
+            <input
+                type="text"
+                id="packageField"
+                rows="1"
+                cols="30"
+                value="com.freecast.watch"
+            >
+            <br>
+            <br>
+            <button id="installButton">Install APK</button>
+            <button id="startButton">Start APK</button>
+            <button id="stopButton">Stop APK</button>
+            <button id="clearButton">Clear Cache</button>
+            <button id="uninstallButton">Uninstall APK</button>
+            <p></p>
+            <label for="installStatusField">Result:</label>
+            <textarea
+                id="installStatusField"
+                rows="5"
+                cols="60"
+                readonly
+            >
+                Not much is happening at the moment
+            </textarea
+            >
+        </div>
+        <div id="section">
+            <p>Type</p>
+            <label for="typeInput">Send Text to Device Input:</label>
+            <input
+                type="text"
+                id="typeInput"
+                rows="1"
+                cols="60"
+            >
+            <button id="typeButton">Send</button>
+            <button id="backspaceButton">Backspace</button>
+        </div>
+        <script>
+            const electron = require("electron");
+            const { ipcRenderer } = electron;
+            const deviceInput = document.getElementById("deviceFieldIP");
+            const apkInput = document.getElementById("packageField").value;
+            const typeInput = document.getElementById("typeInput");
 
-<head>
-    <meta charset="UTF-8">
-    <title>Android QA Tool</title>
-    <link href="static/css/style.css"  rel="stylesheet">
-</head>
+            const connectButton = document.getElementById("connectButton");
+            const disconnectButton =
+                document.getElementById("disconnectButton");
+            const installButton = document.getElementById("installButton");
+            const directoryButton = document.getElementById("directoryButton");
+            const startButton = document.getElementById("startButton");
+            const stopButton = document.getElementById("stopButton");
+            const clearButton = document.getElementById("clearButton");
+            const typeInputButton = document.getElementById("typeButton");
+            const backspaceButton = document.getElementById("backspaceButton");
+            const uninstallButton = document.getElementById("uninstallButton");
 
-<body>
-    <div id="section">
-        <p>Connection</p>
-        <label for="deviceField">Devices:</label>
-        <textarea id="deviceField" rows="2" cols="50" readonly>No devices</textarea>
-        <br><br>
-        <label for="deviceStatusField">Status:</label>
-        <textarea id="deviceStatusField" rows="3" cols="50" readonly>Chilling</textarea>
-        <br><br>
-        <label for="deviceFieldIP">Device:</label>
-        <input type="text" id="deviceFieldIP" rows="1" cols="30">
-        <button id="connectButton">Connect</button>
+            const installStatus = document.getElementById("installStatusField");
 
-        <button id="disconnectButton">Disconnect</button>
-    </div>
-    <div id="section">
-        <p>Application</p>
-        <label for="directoryField">APK directory:</label>
-        <textarea id="directoryField" rows="1" cols="30" readonly>I'm lost, point me somewhere -></textarea>
-        <button id="directoryButton">Browse</button>
-        <p></p>
-        <label for="packageField">APK Package Name:</label>
-        <input type="text" id="packageField" rows="1" cols="30" value="com.freecast.watch">
-        <br><br>
-        <button id="installButton">Install APK</button>
-        <button id="startButton">Start APK</button>
-        <button id="stopButton">Stop APK</button>
-        <button id="clearButton">Clear Cache</button>
-        <button id="uninstallButton">Uninstall APK</button>
-        <p></p>
-        <label for="installStatusField">Result:</label>
-        <textarea id="installStatusField" rows="5" cols="60" readonly>Not much is happening at the moment</textarea>
-    </div>
+            ipcRenderer.send("checkDevices");
 
-    <div id="section">
-        <p>Type</p>
-        <label for="typeInput">Send Text to Device Input:</label>
-        <input type="text" id="typeInput" rows="1" cols="60">
-        <button id="typeButton">Send</button>
-        <button id="backspaceButton">Backspace</button>
-    </div>
+            deviceInput.onkeydown = function (e) {
+                if (e.keyCode == 13) {
+                    connectButton.click();
+                }
+            };
 
-    <script>
-        const electron = require('electron')
-        const { ipcRenderer } = electron;
-        const deviceInput = document.getElementById('deviceFieldIP');
-        const apkInput = document.getElementById('packageField').value;
-        const typeInput = document.getElementById('typeInput');
+            typeInput.onkeydown = function (e) {
+                if (e.keyCode == 13) {
+                    typeInputButton.click();
+                }
+            };
 
-        const connectButton = document.getElementById('connectButton')
-        const disconnectButton = document.getElementById('disconnectButton')
-        const installButton  = document.getElementById('installButton')
-        const directoryButton = document.getElementById('directoryButton');
-        const startButton = document.getElementById('startButton');
-        const stopButton = document.getElementById('stopButton');
-        const clearButton = document.getElementById('clearButton');
-        const typeInputButton = document.getElementById('typeButton');
-        const backspaceButton = document.getElementById('backspaceButton');
-        const uninstallButton = document.getElementById('uninstallButton');
+            connectButton.addEventListener("click", () => {
+                document.getElementById(
+                    "deviceStatusField"
+                ).value = `Running...`;
+                ipcRenderer.send("connectDevice", deviceInput.value);
+            });
 
-        const installStatus = document.getElementById('installStatusField');
-        
+            disconnectButton.addEventListener("click", () => {
+                ipcRenderer.send("disconnectDevice");
+            });
 
-        
-        ipcRenderer.send('checkDevices');
+            installButton.addEventListener("click", () => {
+                let apkPath = document.getElementById("directoryField").value;
+                if (apkPath) {
+                    installStatus.value = "Busy...";
+                    ipcRenderer.send("installApk", apkPath);
+                }
+            });
 
-        deviceInput.onkeydown = function(e) {
-            if(e.keyCode == 13) {
-                connectButton.click();
-            }
-        }
+            startButton.addEventListener("click", () => {
+                installStatus.value = "Starting...";
+                ipcRenderer.send("startApk", apkInput);
+            });
 
-        typeInput.onkeydown = function(e) {
-            if(e.keyCode == 13) {
-                typeInputButton.click();
-            }
-        }
+            stopButton.addEventListener("click", () => {
+                installStatus.value = "Stopping...";
+                ipcRenderer.send("stopApk", apkInput);
+            });
 
-        connectButton.addEventListener('click', () => {
-            document.getElementById('deviceStatusField').value = `Running...`;
-            ipcRenderer.send('connectDevice', deviceInput.value);
-        })
+            clearButton.addEventListener("click", () => {
+                installStatus.value = "Clearing...";
+                ipcRenderer.send("clearApk", apkInput);
+            });
 
-        disconnectButton.addEventListener('click', () => {
-            ipcRenderer.send('disconnectDevice');
-        })
+            clearButton.addEventListener("click", () => {
+                installStatus.value = "Clearing...";
+                ipcRenderer.send("clearApk", apkInput);
+            });
 
-        installButton.addEventListener('click', () => {
-            let apkPath = document.getElementById('directoryField').value;
-            if (apkPath) {
-                installStatus.value = "Busy...";
-                ipcRenderer.send('installApk', apkPath);
-            }
-        });
+            uninstallButton.addEventListener("click", () => {
+                ipcRenderer.send("uninstallApk", apkInput);
+            });
 
-        startButton.addEventListener('click', () => {
-            installStatus.value = "Starting...";
-            ipcRenderer.send('startApk', apkInput);
-        });
+            typeInputButton.addEventListener("click", () => {
+                ipcRenderer.send("typeTextAction", typeInput.value);
+            });
 
-        stopButton.addEventListener('click', () => {
-            installStatus.value = "Stopping...";
-            ipcRenderer.send('stopApk', apkInput);
-        });
+            backspaceButton.addEventListener("click", () => {
+                ipcRenderer.send("backspaceAction");
+            });
 
-        clearButton.addEventListener('click', () => {
-            installStatus.value = "Clearing...";
-            ipcRenderer.send('clearApk', apkInput);
-        });
+            directoryButton.addEventListener("click", () => {
+                ipcRenderer.send("openFileDialog");
+            });
 
-        clearButton.addEventListener('click', () => {
-            installStatus.value = "Clearing...";
-            ipcRenderer.send('clearApk', apkInput);
-        });
+            ipcRenderer.on("updateDirectory", (event, arg) => {
+                document.getElementById("directoryField").value = arg;
+            });
 
-        uninstallButton.addEventListener('click', () => {
-            ipcRenderer.send('uninstallApk', apkInput);
-        });
+            ipcRenderer.on("updateDeviceStatus", (event, arg) => {
+                document.getElementById("deviceStatusField").value = `${arg}\n`;
+            });
 
-        typeInputButton.addEventListener('click', () => {
-            ipcRenderer.send('typeTextAction', typeInput.value);
-        });
+            ipcRenderer.on("updateInstallStatus", (event, arg) => {
+                document.getElementById(
+                    "installStatusField"
+                ).value = `${arg}\n`;
+            });
 
-        backspaceButton.addEventListener('click', () => {
-            ipcRenderer.send('backspaceAction');
-        });
+            ipcRenderer.on("updateDeviceUnitStatus", (event, arg) => {
+                document.getElementById("deviceField").value = `${arg}\n`;
+            });
 
-        directoryButton.addEventListener('click', () => {
-            ipcRenderer.send('openFileDialog');
-        });
-
-        ipcRenderer.on('updateDirectory', (event, arg) => {
-            document.getElementById('directoryField').value = arg;
-        });
-
-        ipcRenderer.on('updateDeviceStatus', (event, arg) => {
-            document.getElementById('deviceStatusField').value = `${arg}\n`;
-        });
-
-        ipcRenderer.on('updateInstallStatus', (event, arg) => {
-            document.getElementById('installStatusField').value = `${arg}\n`;
-        });
-
-        ipcRenderer.on('updateDeviceUnitStatus', (event, arg) => {
-            document.getElementById('deviceField').value = `${arg}\n`;
-        });
-
-        ipcRenderer.on('updateTypeInputField', (event, arg) => {
-            typeInput.value = "";
-        });
-    </script>
-</body>
-
+            ipcRenderer.on("updateTypeInputField", (event, arg) => {
+                typeInput.value = "";
+            });
+        </script>
+    </body>
 </html>
