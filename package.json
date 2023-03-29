@@ -20,5 +20,9 @@
 	},
 	"dependencies": {
 		"electron": "^23.2.0"
+	},
+	"devDependencies": {
+		"eslint": "^8.37.0",
+		"eslint-config-google": "^0.14.0"
 	}
 }

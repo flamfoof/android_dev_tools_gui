@@ -29,7 +29,7 @@
         <button id="directoryButton">Browse</button>
         <p></p>
         <label for="packageField">APK Package Name:</label>
-        <input type="text" id="packageField" rows="1" cols="30" value="com.something.somewhere">
+        <input type="text" id="packageField" rows="1" cols="30" value="com.freecast.watch">
         <br><br>
         <button id="installButton">Install APK</button>
         <button id="startButton">Start APK</button>
@@ -52,22 +52,22 @@
     <script>
         const electron = require('electron')
         const { ipcRenderer } = electron;
-        var deviceInput = document.getElementById('deviceFieldIP');
-        var apkInput = document.getElementById('packageField').value;
-        var typeInput = document.getElementById('typeInput');
+        const deviceInput = document.getElementById('deviceFieldIP');
+        const apkInput = document.getElementById('packageField').value;
+        const typeInput = document.getElementById('typeInput');
 
-        var connectButton = document.getElementById('connectButton')
-        var disconnectButton = document.getElementById('disconnectButton')
-        var installButton  = document.getElementById('installButton')
-        var directoryButton = document.getElementById('directoryButton');
-        var startButton = document.getElementById('startButton');
-        var stopButton = document.getElementById('stopButton');
-        var clearButton = document.getElementById('clearButton');
-        var typeInputButton = document.getElementById('typeButton');
-        var backspaceButton = document.getElementById('backspaceButton');
-        var uninstallButton = document.getElementById('uninstallButton');
+        const connectButton = document.getElementById('connectButton')
+        const disconnectButton = document.getElementById('disconnectButton')
+        const installButton  = document.getElementById('installButton')
+        const directoryButton = document.getElementById('directoryButton');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const clearButton = document.getElementById('clearButton');
+        const typeInputButton = document.getElementById('typeButton');
+        const backspaceButton = document.getElementById('backspaceButton');
+        const uninstallButton = document.getElementById('uninstallButton');
 
-        var installStatus = document.getElementById('installStatusField');
+        const installStatus = document.getElementById('installStatusField');
         
 
         
