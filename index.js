@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 const electron = require("electron")
 const { app, BrowserWindow, dialog } = electron
 const cp = require("child_process")
@@ -58,7 +59,6 @@ setInterval(checkDevices, 5000)
 async function checkDevices() {
     let defaultMessage
     let deviceModel
-
     const getConnectedDevice = cp.spawn(`adb`, ["devices"])
 
     getConnectedDevice.stderr.on("data", (data) => {
@@ -69,6 +69,10 @@ async function checkDevices() {
         defaultMessage = data.toString()
         forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel)
         const getDeviceIP = cp.spawn(`adb`, "shell ip addr show wlan0".split(" "))
+
+        getDeviceIP.stderr.on("data", (data) => {
+            deviceIP = null;
+        })
 
         getDeviceIP.stdout.on("data", (data) => {
             try {
@@ -88,7 +92,7 @@ async function checkDevices() {
 }
 
 function forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel) {
-    if (deviceIP != null || deviceModel != null) {
+    if (deviceIP != null && deviceModel != null) {
         mainWindow.webContents.send("updateDeviceUnitStatus", `Connected to: ${deviceModel} as "${deviceIP}"`)
     } else {
         mainWindow.webContents.send("updateDeviceUnitStatus", `${defaultMessage}`)
@@ -108,7 +112,7 @@ async function connectDevice(deviceIPAddress) {
 }
 
 async function disconnectDevice() {
-    const disconnect = cp.spawn(`adb`, `disconnect ${deviceIP}`.split(" "))
+    const disconnect = cp.spawn(`adb`, `disconnect`.split(" "))
     disconnect.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateDeviceStatus", `${data}`)
     })
