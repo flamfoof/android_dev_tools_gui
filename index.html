@@ -20,6 +20,7 @@
             <input type="text" id="deviceFieldIP" rows="1" cols="30" />
             <button id="connectButton">Connect</button>
             <button id="disconnectButton">Disconnect</button>
+            <button id="stopAdbButton">Stop ADB</button>
         </div>
         <div id="section">
             <p>Application</p>
@@ -28,7 +29,7 @@
             <button id="directoryButton">Browse</button>
             <p></p>
             <label for="packageField">APK Package Name:</label>
-            <input type="text" id="packageField" rows="1" cols="30" value="com.your.apk" />
+            <input type="text" id="packageField" rows="1" cols="30" value="com.watch.freecast" />
             <br />
             <br />
             <button id="installButton">Install APK</button>
@@ -56,6 +57,7 @@
 
             const connectButton = document.getElementById("connectButton")
             const disconnectButton = document.getElementById("disconnectButton")
+            const stopAdbButton = document.getElementById("stopAdbButton")
             const installButton = document.getElementById("installButton")
             const directoryButton = document.getElementById("directoryButton")
             const startButton = document.getElementById("startButton")
@@ -88,6 +90,10 @@
 
             disconnectButton.addEventListener("click", () => {
                 ipcRenderer.send("disconnectDevice")
+            })
+
+            stopAdbButton.addEventListener("click", () => {
+                ipcRenderer.send("stopAdb")
             })
 
             installButton.addEventListener("click", () => {

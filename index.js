@@ -5,6 +5,8 @@ const cp = require("child_process")
 
 let mainWindow
 let deviceIP
+let serverRunning = true
+let checkDeviceStatusClock = setInterval(checkDevices, 5000)
 
 app.on("ready", () => {
     mainWindow = new BrowserWindow({
@@ -28,6 +30,7 @@ electron.ipcMain.on("connectDevice", (event, arg) => {
     connectDevice(arg)
 })
 electron.ipcMain.on("disconnectDevice", disconnectDevice)
+electron.ipcMain.on("stopAdb", stopAdb)
 electron.ipcMain.on("checkDevices", checkDevices)
 electron.ipcMain.on("installApk", (event, arg) => {
     installApk(arg)
@@ -35,6 +38,10 @@ electron.ipcMain.on("installApk", (event, arg) => {
 electron.ipcMain.on("startApk", (event, arg) => {
     console.log("start")
     startApk(arg)
+})
+electron.ipcMain.on("stopApk", (event, arg) => {
+    console.log("stop")
+    stopApk(arg)
 })
 electron.ipcMain.on("stopApk", (event, arg) => {
     console.log("stop")
@@ -54,11 +61,14 @@ electron.ipcMain.on("typeTextAction", (event, arg) => {
 })
 electron.ipcMain.on("backspaceAction", backspaceAction)
 
-setInterval(checkDevices, 5000)
-
 async function checkDevices() {
     let defaultMessage
     let deviceModel
+
+    if (!serverRunning) {
+        return
+    }
+
     const getConnectedDevice = cp.spawn(`adb`, ["devices"])
 
     getConnectedDevice.stderr.on("data", (data) => {
@@ -71,7 +81,7 @@ async function checkDevices() {
         const getDeviceIP = cp.spawn(`adb`, "shell ip addr show wlan0".split(" "))
 
         getDeviceIP.stderr.on("data", (data) => {
-            deviceIP = null;
+            deviceIP = null
         })
 
         getDeviceIP.stdout.on("data", (data) => {
@@ -100,7 +110,10 @@ function forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel) {
 }
 
 async function connectDevice(deviceIPAddress) {
+    console.log("Connect??")
     const connect = cp.spawn(`adb`, `connect ${deviceIPAddress}`.split(" "))
+    serverRunning = true
+
     connect.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateDeviceStatus", `${data}`)
     })
@@ -119,6 +132,21 @@ async function disconnectDevice() {
     disconnect.stdout.on("data", (data) => {
         mainWindow.webContents.send("updateDeviceStatus", `${data}`)
         deviceIP = null
+        checkDevices()
+    })
+}
+
+async function stopAdb() {
+    console.log("stop adb")
+    const adbKill = cp.spawn(`adb`, `kill-server`.split(" "))
+    adbKill.stderr.on("data", (data) => {
+        mainWindow.webContents.send("updateDeviceStatus", `${data}`)
+    })
+    adbKill.stdout.on("data", (data) => {
+        mainWindow.webContents.send("updateDeviceStatus", `${data}`)
+        deviceIP = null
+        mainWindow.webContents.send("updateDeviceUnitStatus", `Adb is dead`)
+        serverRunning = false
         checkDevices()
     })
 }
