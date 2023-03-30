@@ -51,7 +51,7 @@
             const electron = require("electron")
             const { ipcRenderer } = electron
             const deviceInput = document.getElementById("deviceFieldIP")
-            const apkInput = document.getElementById("packageField").value
+            const apkInput = document.getElementById("packageField")
             const typeInput = document.getElementById("typeInput")
 
             const connectButton = document.getElementById("connectButton")
@@ -100,26 +100,21 @@
 
             startButton.addEventListener("click", () => {
                 installStatus.value = "Starting..."
-                ipcRenderer.send("startApk", apkInput)
+                ipcRenderer.send("startApk", apkInput.value)
             })
 
             stopButton.addEventListener("click", () => {
                 installStatus.value = "Stopping..."
-                ipcRenderer.send("stopApk", apkInput)
+                ipcRenderer.send("stopApk", apkInput.value)
             })
 
             clearButton.addEventListener("click", () => {
                 installStatus.value = "Clearing..."
-                ipcRenderer.send("clearApk", apkInput)
-            })
-
-            clearButton.addEventListener("click", () => {
-                installStatus.value = "Clearing..."
-                ipcRenderer.send("clearApk", apkInput)
+                ipcRenderer.send("clearApk", apkInput.value)
             })
 
             uninstallButton.addEventListener("click", () => {
-                ipcRenderer.send("uninstallApk", apkInput)
+                ipcRenderer.send("uninstallApk", apkInput.value)
             })
 
             typeInputButton.addEventListener("click", () => {
