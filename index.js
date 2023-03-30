@@ -6,7 +6,7 @@ const cp = require("child_process")
 let mainWindow
 let deviceIP
 let serverRunning = true
-let checkDeviceStatusClock = setInterval(checkDevices, 5000)
+setInterval(checkDevices, 5000)
 
 app.on("ready", () => {
     mainWindow = new BrowserWindow({
