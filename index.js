@@ -142,10 +142,16 @@ async function stopAdb() {
     adbKill.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateDeviceStatus", `${data}`)
     })
-    adbKill.stdout.on("data", (data) => {
-        mainWindow.webContents.send("updateDeviceStatus", `${data}`)
+    adbKill.on("close", () => {
+        mainWindow.webContents.send("updateDeviceStatus", `Adb is dead`)
         deviceIP = null
-        mainWindow.webContents.send("updateDeviceUnitStatus", `Adb is dead`)
+        serverRunning = false
+        checkDevices()
+    })
+    adbKill.stdout.on("data", (data) => {
+        mainWindow.webContents.send("updateDeviceUnitStatus", `${data}`)
+        mainWindow.webContents.send("updateDeviceStatus", `Adb is dead`)
+        deviceIP = null
         serverRunning = false
         checkDevices()
     })
