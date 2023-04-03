@@ -1,3 +1,10 @@
+p {
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 21px;
+    line-height: 1.4;
+    color: #333;
+}
+
 #section {
     display: block;
     border-radius: 1px;
@@ -26,4 +33,16 @@ textarea.connected {
 textarea.disconnected {
     background: #ffbaba;
     resize: none;
+}
+
+textarea#directoryField {
+    background: #e3ecf8;
+    width:400px;
+    resize: true;
+}
+
+select#deviceProfileNames {
+    background: #e3ecf8;
+    width:500px;
+    resize: true;
 }

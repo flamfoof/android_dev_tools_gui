@@ -7,17 +7,34 @@
     </head>
     <body>
         <div id="section">
+            <p>Profiles</p>
+            <label for="deviceNameField">Profile Name:</label>
+            <input type="text" id="deviceNameField" rows="1" cols="30" />
+            <button id="profileSaveButton">Save this profile</button>
+            <br />
+            *Please ensure Device IP field is correct before saving profile(It will assign the IP to the profile name).
+            If connected, it will save the device model also
+            <br />
+            Any logs will be sent to the Connection Status field.
+            <p></p>
+            <div class="dropdown">
+                <select name="deviceProfiles" id="deviceProfileNames" cols="5" width="500px">
+                    <option value="">Click here to choose profile (Profile Name | IP Address | Device)</option>
+                </select>
+                <button id="profileRemoveButton">Remove Profile</button>
+            </div>
+
             <p>Connection</p>
-            <label for="deviceField">Devices:</label>
-            <textarea id="deviceField" rows="2" cols="50" readonly>No devices</textarea>
+            <label for="deviceConnectionField">Devices:</label>
+            <textarea id="deviceConnectionField" rows="2" cols="50" readonly>No devices</textarea>
             <br />
             <br />
             <label for="deviceStatusField">Status:</label>
             <textarea id="deviceStatusField" rows="3" cols="50" readonly>Chilling</textarea>
             <br />
             <br />
-            <label for="deviceFieldIP">Device:</label>
-            <input type="text" id="deviceFieldIP" rows="1" cols="30" />
+            <label for="deviceIPField">Device:</label>
+            <input type="text" id="deviceIPField" rows="1" cols="30" />
             <button id="connectButton">Connect</button>
             <button id="disconnectButton">Disconnect</button>
             <button id="stopAdbButton">Stop ADB</button>
@@ -25,11 +42,11 @@
         <div id="section">
             <p>Application</p>
             <label for="directoryField">APK directory:</label>
-            <textarea id="directoryField" rows="1" cols="35" readonly>I'm lost, point me somewhere -></textarea>
+            <textarea id="directoryField" rows="2" cols="35" readonly>I'm lost, point me somewhere -></textarea>
             <button id="directoryButton">Browse</button>
             <p></p>
             <label for="packageField">APK Package Name:</label>
-            <input type="text" id="packageField" rows="1" cols="30" value="com.watch.freecast" />
+            <input type="text" id="packageField" rows="1" cols="30" value="com.freecast.watch" />
             <br />
             <br />
             <button id="installButton">Install APK</button>
@@ -42,7 +59,7 @@
             <textarea id="installStatusField" rows="5" cols="60" readonly>Not much is happening at the moment</textarea>
         </div>
         <div id="section">
-            <p>Type</p>
+            <p>Actions</p>
             <label for="typeInput">Send Text to Device Input:</label>
             <input type="text" id="typeInput" rows="1" cols="60" />
             <button id="typeButton">Send</button>
@@ -51,10 +68,29 @@
         <script>
             const electron = require("electron")
             const { ipcRenderer } = electron
-            const deviceInput = document.getElementById("deviceFieldIP")
+
+            //profile
+            let currentProfile = {}
+            let currentConfig = {}
+            let currentDevice = {}
+
+            //inputs
+            const deviceInput = document.getElementById("deviceIPField")
             const apkInput = document.getElementById("packageField")
             const typeInput = document.getElementById("typeInput")
+            const saveInput = document.getElementById("deviceNameField")
+            const profileNamesList = document.getElementById("deviceProfileNames")
 
+            //fields
+            const deviceConnectionStatus = document.getElementById("deviceConnectionField")
+            const deviceStatus = document.getElementById("deviceStatusField")
+            const installStatus = document.getElementById("installStatusField")
+            const directoryField = document.getElementById("directoryField")
+
+            //buttons
+            const profileSaveButton = document.getElementById("profileSaveButton")
+            const profileLoadButton = document.getElementById("profileLoadButton")
+            const profileRemoveButton = document.getElementById("profileRemoveButton")
             const connectButton = document.getElementById("connectButton")
             const disconnectButton = document.getElementById("disconnectButton")
             const stopAdbButton = document.getElementById("stopAdbButton")
@@ -66,8 +102,6 @@
             const typeInputButton = document.getElementById("typeButton")
             const backspaceButton = document.getElementById("backspaceButton")
             const uninstallButton = document.getElementById("uninstallButton")
-
-            const installStatus = document.getElementById("installStatusField")
 
             ipcRenderer.send("checkDevices")
 
@@ -83,8 +117,67 @@
                 }
             }
 
+            profileNamesList.addEventListener("change", function handleChange(event) {
+                currentProfile = {}
+                let selectedOption = event.target.options[event.target.selectedIndex]
+                currentProfile.name = selectedOption.getAttribute("name")
+                currentProfile.ip = selectedOption.getAttribute("value")
+                currentProfile.model = selectedOption.getAttribute("model")
+
+                // Do by default
+                deviceInput.value = currentProfile.ip
+
+                if (currentProfile.name) {
+                    deviceStatus.value = `Loaded profile: ${currentProfile.name}`
+                }
+            })
+
+            profileSaveButton.addEventListener("click", () => {
+                let newDeviceProfile = {
+                    name: saveInput.value,
+                    ip: deviceInput.value,
+                    model: currentDevice?.model
+                }
+                let profileIndex = currentConfig.deviceProfiles.findIndex(
+                    (profile) => profile.name === newDeviceProfile.name
+                )
+
+                currentDevice = newDeviceProfile
+
+                if (profileIndex > -1) {
+                    currentConfig.deviceProfiles[profileIndex] = newDeviceProfile
+                    deviceStatus.value = `Updated profile: ${newDeviceProfile.name}\n`
+                } else {
+                    currentConfig.deviceProfiles.push(newDeviceProfile)
+                    deviceStatus.value = `Added profile: ${newDeviceProfile.name}\n`
+                }
+
+                ipcRenderer.send("updateConfig", ["add", currentConfig])
+                ipcRenderer.send("refreshConfig")
+            })
+
+            profileRemoveButton.addEventListener("click", () => {
+                let profileIndex = currentConfig.deviceProfiles.findIndex(
+                    (profile) => profile.name === currentProfile.name
+                )
+
+                currentConfig.deviceProfiles.splice(profileIndex, 1)
+
+                if (profileIndex > -1) {
+                    deviceStatus.value = `Removed profile: ${currentProfile.name}\n`
+                    ipcRenderer.send("updateConfig", ["remove", currentConfig])
+                } else {
+                    deviceStatus.value = `Failed to remove profile: ${currentProfile.name}\n`
+                }
+                
+                ipcRenderer.send("refreshConfig")
+            })
+
             connectButton.addEventListener("click", () => {
-                document.getElementById("deviceStatusField").value = `Running...`
+                deviceStatus.value = `Running...`
+
+                currentDevice.ip = deviceInput.value
+
                 ipcRenderer.send("connectDevice", deviceInput.value)
             })
 
@@ -136,23 +229,49 @@
             })
 
             ipcRenderer.on("updateDirectory", (event, arg) => {
-                document.getElementById("directoryField").value = arg
+                directoryField.value = arg
             })
 
             ipcRenderer.on("updateDeviceStatus", (event, arg) => {
-                document.getElementById("deviceStatusField").value = `${arg}\n`
+                deviceStatus.value = `${arg}\n`
             })
 
             ipcRenderer.on("updateInstallStatus", (event, arg) => {
-                document.getElementById("installStatusField").value = `${arg}\n`
+                installStatus.value = `${arg}\n`
             })
 
             ipcRenderer.on("updateDeviceUnitStatus", (event, arg) => {
-                document.getElementById("deviceField").value = `${arg}\n`
+                try {
+                    let model = arg.model.split("\\")[0]
+                    currentDevice.model = model
+                } catch (e) {
+                    deviceConnectionStatus.value = `${arg}\n`
+                }
             })
 
             ipcRenderer.on("updateTypeInputField", (event, arg) => {
                 typeInput.value = ""
+            })
+
+            ipcRenderer.on("updateConfigField", (event, arg) => {
+                currentConfig = arg
+
+                ipcRenderer.send("updateConfig", ["bungie", "gum"])
+                deviceStatus.value = `${JSON.stringify(arg)}`
+            })
+
+            ipcRenderer.on("refreshConfigField", (event, arg) => {
+                currentConfig = arg
+
+                profileNamesList.options.length = 1
+                for (let i = 0; i < currentConfig.deviceProfiles.length; i++) {
+                    let newOpts = document.createElement("option")
+                    newOpts.setAttribute("name", currentConfig.deviceProfiles[i].name)
+                    newOpts.setAttribute("value", currentConfig.deviceProfiles[i].ip)
+                    newOpts.setAttribute("model", currentConfig.deviceProfiles[i].model)
+                    newOpts.text = `${currentConfig.deviceProfiles[i].name} | ${currentConfig.deviceProfiles[i].ip} | ${currentConfig.deviceProfiles[i].model}`
+                    profileNamesList.options.add(newOpts)
+                }
             })
         </script>
     </body>

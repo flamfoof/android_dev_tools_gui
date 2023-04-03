@@ -2,10 +2,13 @@
 const electron = require("electron")
 const { app, BrowserWindow, dialog } = electron
 const cp = require("child_process")
+const fs = require("fs")
 
 let mainWindow
 let deviceIP
 let serverRunning = true
+let config = {}
+
 setInterval(checkDevices, 5000)
 
 app.on("ready", () => {
@@ -19,12 +22,12 @@ app.on("ready", () => {
         }
     })
 
-    mainWindow.loadFile("index.html")
+    mainWindow.loadFile("index.html").finally(() => {
+        // mainWindow.webContents.send("updateConfigField", config)
+        refreshConfig()
+    })
 })
 
-electron.ipcMain.on("inputSubmitted", (event, arg) => {
-    mainWindow.webContents.send("update-textbox", arg)
-})
 electron.ipcMain.on("openFileDialog", openFileDialog)
 electron.ipcMain.on("connectDevice", (event, arg) => {
     connectDevice(arg)
@@ -43,10 +46,6 @@ electron.ipcMain.on("stopApk", (event, arg) => {
     console.log("stop")
     stopApk(arg)
 })
-electron.ipcMain.on("stopApk", (event, arg) => {
-    console.log("stop")
-    stopApk(arg)
-})
 electron.ipcMain.on("clearApk", (event, arg) => {
     console.log("clear")
     clearApk(arg)
@@ -60,6 +59,10 @@ electron.ipcMain.on("typeTextAction", (event, arg) => {
     typeTextAction(arg)
 })
 electron.ipcMain.on("backspaceAction", backspaceAction)
+electron.ipcMain.on("refreshConfig", refreshConfig)
+electron.ipcMain.on("updateConfig", (event, arg) => {
+    updateConfig(arg[0], arg[1])
+})
 
 async function checkDevices() {
     let defaultMessage
@@ -103,6 +106,12 @@ async function checkDevices() {
 
 function forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel) {
     if (deviceIP != null && deviceModel != null) {
+        const deviceProp = {
+            ip: deviceIP,
+            model: deviceModel
+        }
+
+        mainWindow.webContents.send("updateDeviceUnitStatus", deviceProp)
         mainWindow.webContents.send("updateDeviceUnitStatus", `Connected to: ${deviceModel} as "${deviceIP}"`)
     } else {
         mainWindow.webContents.send("updateDeviceUnitStatus", `${defaultMessage}`)
@@ -110,7 +119,6 @@ function forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel) {
 }
 
 async function connectDevice(deviceIPAddress) {
-    console.log("Connect??")
     const connect = cp.spawn(`adb`, `connect ${deviceIPAddress}`.split(" "))
     serverRunning = true
 
@@ -251,8 +259,31 @@ async function uninstallApk(apkPackage) {
     })
 }
 
+async function refreshConfig(configData) {
+    console.log(`${__dirname}/config.json`)
+    config = JSON.parse(fs.readFileSync(`${__dirname}/config.json`))
+    mainWindow.webContents.send("refreshConfigField", config)
+}
+
+async function updateConfig(action, configData) {
+    try {
+        fs.writeFileSync(`${__dirname}/config.json`, JSON.stringify(configData, null, 2))
+        console.log(`Config file saved to ${__dirname}/config.json`)
+    } catch (err) {
+        console.error(`Error writing config file: ${err.message}`)
+    }
+
+    return "Invalid Action"
+}
+
 async function typeTextAction(inputText) {
-    cp.spawn(`adb`, `shell input text ${inputText}`.split(" "))
+    console.log(`shell input text ${inputText}`)
+    if (inputText == "") {
+        cp.spawn(`adb`, `shell input keyevent 66`.split(" "))
+    } else {
+        cp.spawn(`adb`, `shell input text "${inputText}"`.split(" "))
+    }
+
     mainWindow.webContents.send("updateTypeInputField")
 }
 
