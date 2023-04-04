@@ -166,12 +166,33 @@ async function stopAdb() {
 }
 
 async function installApk(apkPath) {
-    const install = cp.spawn(`adb`, `install ${apkPath}`.split(" "))
+    const install = cp.spawn(`adb`, `install ${apkPath}`.split(" "), { shell: true })
+    let fail = false
+    console.log("installlinnn\n")
     install.stderr.on("data", (data) => {
-        mainWindow.webContents.send("updateInstallStatus", `${data}`)
+        mainWindow.webContents.send("updateInstallStatus", `Failed to install because of reasons...\n${data}`)
+        console.log("catastrophic failure")
+        fail = true
+
+        new electron.Notification({
+            title: "APK Install Failed",
+            body: "Your APK failed to install. Please try again."
+        }).show()
+
+        install.kill("SIGINT")
+        return
     })
+
     install.stdout.on("data", (data) => {
+        if (fail) return
+
         mainWindow.webContents.send("updateInstallStatus", `${data}`)
+        if (data.includes("Success")) {
+            new electron.Notification({
+                title: "APK Installed",
+                body: "Your APK has been installed successfully!"
+            }).show()
+        }
     })
 }
 
