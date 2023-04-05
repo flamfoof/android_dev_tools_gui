@@ -55,7 +55,6 @@ electron.ipcMain.on("uninstallApk", (event, arg) => {
     uninstallApk(arg)
 })
 electron.ipcMain.on("typeTextAction", (event, arg) => {
-    console.log("type action!" + arg)
     typeTextAction(arg)
 })
 electron.ipcMain.on("backspaceAction", backspaceAction)
@@ -145,7 +144,6 @@ async function disconnectDevice() {
 }
 
 async function stopAdb() {
-    console.log("stop adb")
     const adbKill = cp.spawn(`adb`, `kill-server`.split(" "))
     adbKill.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateDeviceStatus", `${data}`)
@@ -168,7 +166,7 @@ async function stopAdb() {
 async function installApk(apkPath) {
     const install = cp.spawn(`adb`, `install "${apkPath}"`.split(" "), { shell: true })
     let fail = false
-    console.log("installlinnn\n")
+    
     install.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateInstallStatus", `Failed to install because of reasons...\n${data}`)
         console.log("catastrophic failure")
@@ -305,7 +303,6 @@ async function updateConfig(action, configData) {
 }
 
 async function typeTextAction(inputText) {
-    console.log(`shell input text ${inputText}`)
     if (inputText == "") {
         cp.spawn(`adb`, `shell input keyevent 66`.split(" "))
     } else {
