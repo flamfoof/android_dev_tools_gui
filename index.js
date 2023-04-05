@@ -220,28 +220,35 @@ function openFileDialog() {
 
 async function startApk(apkPackage) {
     let success = false
+    let activityText = ""
     const start = cp.spawn(
         `adb`,
         `shell monkey -p ${apkPackage} -c android.intent.category.LEANBACK_LAUNCHER 1`.split(" ")
     )
     start.stderr.on("data", (data) => {
         if (!success) {
+            activityText = ""
             const altStart = cp.spawn(
                 `adb`,
                 `shell monkey -p ${apkPackage} -c android.intent.category.LAUNCHER 1`.split(" ")
             )
             altStart.stderr.on("data", (data) => {
-                if (!success) mainWindow.webContents.send("updateInstallStatus", `${data}`)
+                if (!success) {
+                    activityText += `${data}`
+                    mainWindow.webContents.send("updateInstallStatus", `${activityText}`)
+                }
             })
 
             altStart.stdout.on("data", (data) => {
-                mainWindow.webContents.send("updateInstallStatus", `${data}`)
+                activityText += `${data}`
+                mainWindow.webContents.send("updateInstallStatus", `${activityText}`)
                 success = true
             })
         }
     })
     start.stdout.on("data", (data) => {
-        mainWindow.webContents.send("updateInstallStatus", `${data}`)
+        activityText += `${data}`
+        mainWindow.webContents.send("updateInstallStatus", `${activityText}`)
         success = true
         if (data.includes("aborted")) {
             success = false
