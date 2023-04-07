@@ -63,7 +63,7 @@
             <label for="typeInput">Send Text to Device Input:</label>
             <input type="text" id="typeInput" rows="1" cols="60" />
             <button id="typeButton">Send</button>
-            <button id="backspaceButton">Backspace</button>
+            <button id="clearTextButton">Clear Text</button>
             <br>
             *You can submit nothing and it will act as an Enter key press
         </div>
@@ -102,7 +102,7 @@
             const stopButton = document.getElementById("stopButton")
             const clearButton = document.getElementById("clearButton")
             const typeInputButton = document.getElementById("typeButton")
-            const backspaceButton = document.getElementById("backspaceButton")
+            const clearTextButton = document.getElementById("clearTextButton")
             const uninstallButton = document.getElementById("uninstallButton")
 
             ipcRenderer.send("checkDevices")
@@ -222,8 +222,8 @@
                 ipcRenderer.send("typeTextAction", typeInput.value)
             })
 
-            backspaceButton.addEventListener("click", () => {
-                ipcRenderer.send("backspaceAction")
+            clearTextButton.addEventListener("click", () => {
+                ipcRenderer.send("clearTextAction")
             })
 
             directoryButton.addEventListener("click", () => {

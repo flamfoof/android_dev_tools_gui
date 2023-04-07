@@ -8,6 +8,7 @@ let mainWindow
 let deviceIP
 let serverRunning = true
 let config = {}
+let typedTextLength = 5
 
 setInterval(checkDevices, 5000)
 
@@ -57,7 +58,7 @@ electron.ipcMain.on("uninstallApk", (event, arg) => {
 electron.ipcMain.on("typeTextAction", (event, arg) => {
     typeTextAction(arg)
 })
-electron.ipcMain.on("backspaceAction", backspaceAction)
+electron.ipcMain.on("clearTextAction", clearTextAction)
 electron.ipcMain.on("refreshConfig", refreshConfig)
 electron.ipcMain.on("updateConfig", (event, arg) => {
     updateConfig(arg[0], arg[1])
@@ -306,12 +307,18 @@ async function typeTextAction(inputText) {
     if (inputText == "") {
         cp.spawn(`adb`, `shell input keyevent 66`.split(" "))
     } else {
+        typedTextLength = inputText.length
         cp.spawn(`adb`, `shell input text "${inputText}"`.split(" "))
     }
 
     mainWindow.webContents.send("updateTypeInputField")
 }
 
-async function backspaceAction() {
-    cp.spawn(`adb`, `shell input keyevent 67`.split(" "))
+async function clearTextAction() {
+    const clearAction = `shell input keyevent 67`.split(" ")
+    for (let i = 0; i < typedTextLength; i++) {
+        clearAction.push("67")
+    }
+
+    cp.spawn(`adb`, clearAction)
 }
