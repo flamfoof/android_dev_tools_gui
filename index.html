@@ -64,7 +64,7 @@
             <input type="text" id="typeInput" rows="1" cols="60" />
             <button id="typeButton">Send</button>
             <button id="clearTextButton">Clear Text</button>
-            <br>
+            <br />
             *You can submit nothing and it will act as an Enter key press
         </div>
         <script>
@@ -266,12 +266,14 @@
                 currentConfig = arg
 
                 profileNamesList.options.length = 1
-                for (let i = 0; i < currentConfig.deviceProfiles.length; i++) {
+                
+                for (let profiles of currentConfig.deviceProfiles) {
+                    console.log(profiles)
                     let newOpts = document.createElement("option")
-                    newOpts.setAttribute("name", currentConfig.deviceProfiles[i].name)
-                    newOpts.setAttribute("value", currentConfig.deviceProfiles[i].ip)
-                    newOpts.setAttribute("model", currentConfig.deviceProfiles[i].model)
-                    newOpts.text = `${currentConfig.deviceProfiles[i].name} | ${currentConfig.deviceProfiles[i].ip} | ${currentConfig.deviceProfiles[i].model}`
+                    newOpts.setAttribute("name", profiles.name)
+                    newOpts.setAttribute("value", profiles.ip)
+                    newOpts.setAttribute("model", profiles.model)
+                    newOpts.text = `${profiles.name} | ${profiles.ip} | ${profiles.model}`
                     profileNamesList.options.add(newOpts)
                 }
             })

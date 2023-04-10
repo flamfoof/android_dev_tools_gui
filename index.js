@@ -24,7 +24,6 @@ app.on("ready", () => {
     })
 
     mainWindow.loadFile("index.html").finally(() => {
-        // mainWindow.webContents.send("updateConfigField", config)
         refreshConfig()
     })
 })
@@ -165,9 +164,9 @@ async function stopAdb() {
 }
 
 async function installApk(apkPath) {
-    const install = cp.spawn(`adb`, `install "${apkPath}"`.split(" "), { shell: true })
+    const install = cp.spawn(`adb`, `install "${apkPath}"`.split(" "))
     let fail = false
-    
+
     install.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateInstallStatus", `Failed to install because of reasons...\n${data}`)
         console.log("catastrophic failure")
@@ -179,7 +178,6 @@ async function installApk(apkPath) {
         }).show()
 
         install.kill("SIGINT")
-        return
     })
 
     install.stdout.on("data", (data) => {
