@@ -164,7 +164,7 @@ async function stopAdb() {
 }
 
 async function installApk(apkPath) {
-    const install = cp.spawn(`adb`, `install "${apkPath}"`.split(" "))
+    const install = cp.spawn(`adb`, `install  ${apkPath}`.split("  "))
     let fail = false
 
     install.stderr.on("data", (data) => {
