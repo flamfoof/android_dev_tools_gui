@@ -1,0 +1,2 @@
+How to build 
+electron-packager . "Android QA Tools" --platform=win32 --out=./out --overwrite

@@ -71,7 +71,7 @@ async function checkDevices() {
         return
     }
 
-    const getConnectedDevice = cp.spawn(`adb`, ["devices"])
+    const getConnectedDevice = cp.spawn(`./static/tools/adb`, ["devices"])
 
     getConnectedDevice.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateDeviceUnitStatus", `No devices found :(`)
@@ -80,7 +80,7 @@ async function checkDevices() {
     getConnectedDevice.stdout.on("data", (data) => {
         defaultMessage = data.toString()
         forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel)
-        const getDeviceIP = cp.spawn(`adb`, "shell ip addr show wlan0".split(" "))
+        const getDeviceIP = cp.spawn(`./static/tools/adb`, "shell ip addr show wlan0".split(" "))
 
         getDeviceIP.stderr.on("data", (data) => {
             deviceIP = null
@@ -93,7 +93,7 @@ async function checkDevices() {
                 console.log("There are no valid IP addresses")
             }
 
-            const getDeviceModel = cp.spawn(`adb`, `-s ${deviceIP} shell getprop ro.product.model`.split(" "))
+            const getDeviceModel = cp.spawn(`./static/tools/adb`, `-s ${deviceIP} shell getprop ro.product.model`.split(" "))
 
             getDeviceModel.stdout.on("data", (data) => {
                 deviceModel = data.toString()
@@ -118,7 +118,7 @@ function forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel) {
 }
 
 async function connectDevice(deviceIPAddress) {
-    const connect = cp.spawn(`adb`, `connect ${deviceIPAddress}`.split(" "))
+    const connect = cp.spawn(`./static/tools/adb`, `connect ${deviceIPAddress}`.split(" "))
     serverRunning = true
 
     connect.stderr.on("data", (data) => {
@@ -132,7 +132,7 @@ async function connectDevice(deviceIPAddress) {
 }
 
 async function disconnectDevice() {
-    const disconnect = cp.spawn(`adb`, `disconnect`.split(" "))
+    const disconnect = cp.spawn(`./static/tools/adb`, `disconnect`.split(" "))
     disconnect.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateDeviceStatus", `${data}`)
     })
@@ -144,7 +144,7 @@ async function disconnectDevice() {
 }
 
 async function stopAdb() {
-    const adbKill = cp.spawn(`adb`, `kill-server`.split(" "))
+    const adbKill = cp.spawn(`./static/tools/adb`, `kill-server`.split(" "))
     adbKill.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateDeviceStatus", `${data}`)
     })
@@ -164,7 +164,7 @@ async function stopAdb() {
 }
 
 async function installApk(apkPath) {
-    const install = cp.spawn(`adb`, ["install", apkPath])
+    const install = cp.spawn(`./static/tools/adb`, ["install", apkPath])
     let fail = false
 
     install.stderr.on("data", (data) => {
@@ -219,14 +219,14 @@ async function startApk(apkPackage) {
     let success = false
     let activityText = ""
     const start = cp.spawn(
-        `adb`,
+        `./static/tools/adb`,
         `shell monkey -p ${apkPackage} -c android.intent.category.LEANBACK_LAUNCHER 1`.split(" ")
     )
     start.stderr.on("data", (data) => {
         if (!success) {
             activityText = ""
             const altStart = cp.spawn(
-                `adb`,
+                `./static/tools/adb`,
                 `shell monkey -p ${apkPackage} -c android.intent.category.LAUNCHER 1`.split(" ")
             )
             altStart.stderr.on("data", (data) => {
@@ -255,7 +255,7 @@ async function startApk(apkPackage) {
 }
 
 async function stopApk(apkPackage) {
-    const stop = cp.spawn(`adb`, `shell am force-stop ${apkPackage}`.split(" "))
+    const stop = cp.spawn(`./static/tools/adb`, `shell am force-stop ${apkPackage}`.split(" "))
     stop.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateInstallStatus", `${data}`)
     })
@@ -265,7 +265,7 @@ async function stopApk(apkPackage) {
 }
 
 async function clearApk(apkPackage) {
-    const clear = cp.spawn(`adb`, `shell pm clear ${apkPackage}`.split(" "))
+    const clear = cp.spawn(`./static/tools/adb`, `shell pm clear ${apkPackage}`.split(" "))
     clear.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateInstallStatus", `${data}`)
     })
@@ -275,7 +275,7 @@ async function clearApk(apkPackage) {
 }
 
 async function uninstallApk(apkPackage) {
-    const uninstall = cp.spawn(`adb`, `uninstall ${apkPackage}`.split(" "))
+    const uninstall = cp.spawn(`./static/tools/adb`, `uninstall ${apkPackage}`.split(" "))
     uninstall.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateInstallStatus", `${data}`)
     })
@@ -303,10 +303,10 @@ async function updateConfig(action, configData) {
 
 async function typeTextAction(inputText) {
     if (inputText == "") {
-        cp.spawn(`adb`, `shell input keyevent 66`.split(" "))
+        cp.spawn(`./static/tools/adb`, `shell input keyevent 66`.split(" "))
     } else {
         typedTextLength = inputText.length
-        cp.spawn(`adb`, `shell input text "${inputText}"`.split(" "))
+        cp.spawn(`./static/tools/adb`, `shell input text "${inputText}"`.split(" "))
     }
 
     mainWindow.webContents.send("updateTypeInputField")
@@ -318,5 +318,5 @@ async function clearTextAction() {
         clearAction.push("67")
     }
 
-    cp.spawn(`adb`, clearAction)
+    cp.spawn(`./static/tools/adb`, clearAction)
 }

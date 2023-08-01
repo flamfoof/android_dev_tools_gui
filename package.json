@@ -1,29 +1,38 @@
 {
-    "name": "Android Dev Tool",
-    "version": "1.1.0",
-    "description": "Electron app for installing APKs using ADB",
-    "main": "index.js",
-    "scripts": {
-        "start": "electron ."
-    },
-    "keywords": [
-        "electron",
-        "adb",
-        "install",
-        "apk"
-    ],
-    "build": {
-        "productName": "Android Dev Tool",
-        "win": {
-            "target": "portable"
-        }
-    },
-    "dependencies": {
-        "electron": "^23.2.0",
-        "eslint-config-prettier": "^8.8.0"
-    },
-    "devDependencies": {
-        "eslint": "^8.37.0",
-        "eslint-config-google": "^0.14.0"
+  "name": "Android_Dev_Tool",
+  "version": "1.1.0",
+  "description": "Electron app for installing APKs using ADB",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
+  },
+  "keywords": [
+    "electron",
+    "adb",
+    "install",
+    "apk"
+  ],
+  "build": {
+    "productName": "Android Dev Tool",
+    "win": {
+      "target": "portable"
     }
+  },
+  "author":"Felix Lam",
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "eslint-config-prettier": "^8.8.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.1.1",
+    "@electron-forge/maker-deb": "^6.1.1",
+    "@electron-forge/maker-rpm": "^6.1.1",
+    "@electron-forge/maker-squirrel": "^6.1.1",
+    "@electron-forge/maker-zip": "^6.1.1",
+    "electron": "^23.3.1",
+    "eslint": "^8.37.0",
+    "eslint-config-google": "^0.14.0"
+  }
 }
