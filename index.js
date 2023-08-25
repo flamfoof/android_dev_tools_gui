@@ -9,7 +9,7 @@ let mainWindow
 let deviceIP
 let serverRunning = true
 let config = {}
-let typedTextLength = 5
+let typedTextLength = 20
 let pathToAdb = join(__dirname, "static/tools/adb")
 
 setInterval(checkDevices, 5000)
@@ -60,6 +60,12 @@ electron.ipcMain.on("uninstallApk", (event, arg) => {
 })
 electron.ipcMain.on("typeTextAction", (event, arg) => {
     typeTextAction(arg)
+})
+electron.ipcMain.on("gohome", (event, arg) => {
+    gohome()
+})
+electron.ipcMain.on("goback", (event, arg) => {
+    goback()
 })
 electron.ipcMain.on("clearTextAction", clearTextAction)
 electron.ipcMain.on("refreshConfig", refreshConfig)
@@ -165,6 +171,14 @@ async function stopAdb() {
         serverRunning = false
         checkDevices()
     })
+}
+async function gohome() {
+    const adbKill = cp.spawn(`${pathToAdb}`, `shell input keyevent KEYCODE_HOME`.split(" "))
+
+}
+async function goback() {
+    const adbKill = cp.spawn(`${pathToAdb}`, `shell input keyevent KEYCODE_BACK`.split(" "))
+
 }
 
 async function installApk(apkPath) {
@@ -309,7 +323,8 @@ async function typeTextAction(inputText) {
     if (inputText == "") {
         cp.spawn(`${pathToAdb}`, `shell input keyevent 66`.split(" "))
     } else {
-        typedTextLength = inputText.length
+        // if(inputText.length > )
+        //     typedTextLength = inputText.length
         cp.spawn(`${pathToAdb}`, `shell input text "${inputText}"`.split(" "))
     }
 
@@ -317,10 +332,11 @@ async function typeTextAction(inputText) {
 }
 
 async function clearTextAction() {
-    const clearAction = `shell input keyevent 67`.split(" ")
+    // cp.spawn(`${pathToAdb}`, `shell input text \'\'`)
+    const clearAction = `shell input keyevent 123 67`.split(" ")
     for (let i = 0; i < typedTextLength; i++) {
         clearAction.push("67")
     }
-
+    // cp.spawn(`${pathToAdb}`, `shell input text \'\'`)
     cp.spawn(`${pathToAdb}`, clearAction)
 }
