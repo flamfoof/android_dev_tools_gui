@@ -6,7 +6,8 @@
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "build": "electron-builder build --windows"
   },
   "keywords": [
     "electron",
@@ -20,7 +21,7 @@
       "target": "portable"
     }
   },
-  "author":"Felix Lam",
+  "author": "Felix Lam",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
     "eslint-config-prettier": "^8.8.0"
@@ -32,6 +33,7 @@
     "@electron-forge/maker-squirrel": "^6.1.1",
     "@electron-forge/maker-zip": "^6.1.1",
     "electron": "^23.3.1",
+    "electron-builder": "^25.1.8",
     "eslint": "^8.37.0",
     "eslint-config-google": "^0.14.0"
   }

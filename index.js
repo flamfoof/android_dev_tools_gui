@@ -10,7 +10,7 @@ let deviceIP
 let serverRunning = true
 let config = {}
 let typedTextLength = 5
-let pathToAdb = join(__dirname, "static/tools/adb")
+let pathToAdb = "adb.exe"
 
 setInterval(checkDevices, 5000)
 

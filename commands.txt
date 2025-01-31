@@ -1,2 +1,5 @@
 How to build 
 electron-packager . "Android QA Tools" --platform=win32 --out=./out --overwrite
+
+Single File
+electron-packager . "Android QA Tools" --platform=win32 --arch=x64 --out=./out --overwrite
