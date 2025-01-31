@@ -19,7 +19,15 @@
     "productName": "Android Dev Tool",
     "win": {
       "target": "portable"
-    }
+    },
+    "compression": "maximum",
+    "files": [
+      "static/**/*",
+      "index.html",
+      "index.js",
+      "package.json",
+      "commands.txt"
+    ]
   },
   "author": "Felix Lam",
   "dependencies": {
