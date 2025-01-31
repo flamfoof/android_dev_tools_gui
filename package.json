@@ -1,5 +1,5 @@
 {
-  "name": "Android_Dev_Tool",
+  "name": "Android_Dev_Tool Frcst",
   "version": "1.1.1",
   "description": "Electron app for installing APKs using ADB",
   "main": "index.js",
@@ -16,7 +16,7 @@
     "apk"
   ],
   "build": {
-    "productName": "Android Dev Tool",
+    "productName": "Android Dev Tool Frcst",
     "win": {
       "target": "portable"
     },
