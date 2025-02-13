@@ -11,6 +11,11 @@ let serverRunning = true
 let config = {}
 let typedTextLength = 5
 let pathToAdb = "adb.exe"
+let appDataPath = app.getPath('userData')
+let defaultConfigData = {
+    "deviceProfiles": [
+    ]
+  }
 
 setInterval(checkDevices, 5000)
 
@@ -24,11 +29,11 @@ app.on("ready", () => {
             enableRemoteModule: true
         }
     })
-    console.log("lol")
+    console.log(appDataPath)
     console.log(resolve(`${pathToAdb}`))
 
     mainWindow.loadFile("index.html").finally(() => {
-        refreshConfig()
+        refreshConfig(defaultConfigData)
     })
 })
 
@@ -288,16 +293,20 @@ async function uninstallApk(apkPackage) {
     })
 }
 
+
 async function refreshConfig(configData) {
-    console.log(`${__dirname}/config.json`)
-    config = JSON.parse(fs.readFileSync(`${__dirname}/config.json`))
+    console.log(`${appDataPath}/config.json`)
+    if(!fs.existsSync(`${appDataPath}/config.json`)) {
+        fs.writeFileSync(`${appDataPath}/config.json`, JSON.stringify(configData, null, 2))
+    }
+    config = JSON.parse(fs.readFileSync(`${appDataPath}/config.json`))
     mainWindow.webContents.send("refreshConfigField", config)
 }
 
 async function updateConfig(action, configData) {
     try {
-        fs.writeFileSync(`${__dirname}/config.json`, JSON.stringify(configData, null, 2))
-        console.log(`Config file saved to ${__dirname}/config.json`)
+        fs.writeFileSync(`${appDataPath}/config.json`, JSON.stringify(configData, null, 2))
+        console.log(`Config file saved to ${appDataPath}/config.json`)
     } catch (err) {
         console.error(`Error writing config file: ${err.message}`)
     }
