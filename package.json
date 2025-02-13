@@ -16,17 +16,37 @@
     "apk"
   ],
   "build": {
-    "productName": "Android Dev Tool",
+    "productName": "Android QA Tool",
+    "appId": "com.android.qatool",
+    "asar": true,
     "win": {
-      "target": "portable"
+      "target": "portable",
+      "icon": "static/icon.png"
     },
     "compression": "maximum",
     "files": [
       "static/**/*",
-      "index.html",
       "index.js",
+      "index.html",
       "package.json",
+      "config.json",
       "commands.txt"
+    ],
+    "directories": {
+      "buildResources": "static"
+    },
+    "removePackageScripts": true,
+    "afterPack": "./build/afterPack.js",
+    "fileAssociations": [],
+    "asarUnpack": [],
+    "extraResources": [
+      {
+        "from": "static",
+        "to": "static",
+        "filter": [
+          "**/*"
+        ]
+      }
     ]
   },
   "author": "Felix Lam",
@@ -36,8 +56,6 @@
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.1.1",
-    "@electron-forge/maker-deb": "^6.1.1",
-    "@electron-forge/maker-rpm": "^6.1.1",
     "@electron-forge/maker-squirrel": "^6.1.1",
     "@electron-forge/maker-zip": "^6.1.1",
     "electron": "^23.3.1",
