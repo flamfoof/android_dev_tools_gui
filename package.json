@@ -35,19 +35,8 @@
     "directories": {
       "buildResources": "static"
     },
-    "removePackageScripts": true,
-    "afterPack": "./build/afterPack.js",
     "fileAssociations": [],
-    "asarUnpack": [],
-    "extraResources": [
-      {
-        "from": "static",
-        "to": "static",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ]
+    "asarUnpack": []
   },
   "author": "Felix Lam",
   "dependencies": {
