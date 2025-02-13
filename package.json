@@ -1,6 +1,6 @@
 {
-  "name": "Android_Dev_Tool",
-  "version": "1.1.1",
+  "name": "Android_QA_Tool",
+  "version": "1.1.2",
   "description": "Electron app for installing APKs using ADB",
   "main": "index.js",
   "scripts": {
