@@ -140,6 +140,22 @@ async function connectDevice(deviceIPAddress) {
     })
 }
 
+async function connectDevice(deviceIPAddress, devicePort, deviceCode) {
+    const disconnect = cp.spawnSync(`${pathToAdb}`, `disconnect`.split(" "))
+    let connectCommand = `connect ${deviceIPAddress}${devicePort ? `:${devicePort}` : ""}${deviceCode ? ` ${deviceCode}` : ""}`.split(" ")
+    const connect = cp.spawn(pathToAdb, connectCommand)
+    serverRunning = true
+    console.log(connectCommand)
+    connect.stderr.on("data", (data) => {
+        mainWindow.webContents.send("updateDeviceStatus", `${data}`)
+    })
+    connect.stdout.on("data", (data) => {
+        mainWindow.webContents.send("updateDeviceStatus", `${data}`)
+        deviceIP = deviceIPAddress
+        checkDevices()
+    })
+}
+
 async function disconnectDevice() {
     const disconnect = cp.spawn(`${pathToAdb}`, `disconnect`.split(" "))
     disconnect.stderr.on("data", (data) => {
