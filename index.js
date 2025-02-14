@@ -21,7 +21,7 @@ setInterval(checkDevices, 5000)
 
 app.on("ready", () => {
     mainWindow = new BrowserWindow({
-        width: 800,
+        width: 750,
         height: 1200,
         webPreferences: {
             nodeIntegration: true,
@@ -38,8 +38,11 @@ app.on("ready", () => {
 })
 
 electron.ipcMain.on("openFileDialog", openFileDialog)
-electron.ipcMain.on("connectDevice", (event, arg) => {
-    connectDevice(arg)
+electron.ipcMain.on("pairDevice", (event, deviceIP, devicePort, deviceCode) => {
+    pairDevice(deviceIP, devicePort, deviceCode)
+})
+electron.ipcMain.on("connectDevice", (event, deviceIP, devicePort, deviceCode) => {
+    connectDevice(deviceIP, devicePort, deviceCode)
 })
 electron.ipcMain.on("disconnectDevice", disconnectDevice)
 electron.ipcMain.on("stopAdb", stopAdb)
@@ -126,9 +129,11 @@ function forceDeviceUpdateStatus(defaultMessage, deviceIP, deviceModel) {
     }
 }
 
-async function connectDevice(deviceIPAddress) {
-    const connect = cp.spawn(`${pathToAdb}`, `connect ${deviceIPAddress}`.split(" "))
-    serverRunning = true
+async function pairDevice(deviceIPAddress, devicePort, deviceCode) {
+    const pairCommand = `pair ${deviceIPAddress}${devicePort ? `:${devicePort}` : ""}${deviceCode ? ` ${deviceCode}` : ""}`.split(" ")
+    const connect = cp.spawn(pathToAdb, pairCommand)
+    serverRunning = true   
+    console.log(pairCommand)
 
     connect.stderr.on("data", (data) => {
         mainWindow.webContents.send("updateDeviceStatus", `${data}`)
