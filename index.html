@@ -33,8 +33,28 @@
             <textarea id="deviceStatusField" rows="3" cols="50" readonly>Chilling</textarea>
             <br />
             <br />
-            <label for="deviceIPField">Device:</label>
-            <input type="text" id="deviceIPField" rows="1" cols="30" />
+            <style>
+                .labelsAndFields {
+                    display: flex;
+                    justify-content: space-between;
+                }
+            </style>
+            <div class="labelsAndFields">
+                <div style="display: flex; align-items: center;">
+                    <label for="deviceIPField">IP:</label>
+                    <input type="text" id="deviceIPField" style="margin-left: 10px;" rows="1" cols="30" />
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <label for="devicePortField">Port:</label>
+                    <input type="text" id="devicePortField" style="margin-left: 10px;" rows="1" cols="30" />
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <label for="deviceCodeField">Code:</label>
+                    <input type="text" id="deviceCodeField" style="margin-left: 10px;" rows="1" cols="30" />
+                </div>
+            </div>
+            <br />
+            <button id="pairButton">Pair</button>
             <button id="connectButton">Connect</button>
             <button id="disconnectButton">Disconnect</button>
             <button id="stopAdbButton">Stop ADB</button>
@@ -46,7 +66,7 @@
             <button id="directoryButton">Browse</button>
             <p></p>
             <label for="packageField">APK Package Name:</label>
-            <input type="text" id="packageField" rows="1" cols="30" value="com.your.apk" />
+            <input type="text" id="packageField" rows="1" cols="30" value="com.freecast.watch" />
             <br />
             <br />
             <button id="installButton">Install APK</button>
@@ -77,7 +97,9 @@
             let currentDevice = {}
 
             //inputs
-            const deviceInput = document.getElementById("deviceIPField")
+            const deviceIPInput = document.getElementById("deviceIPField")
+            const devicePortInput = document.getElementById("devicePortField")
+            const deviceCodeInput = document.getElementById("deviceCodeField")
             const apkInput = document.getElementById("packageField")
             const typeInput = document.getElementById("typeInput")
             const saveInput = document.getElementById("deviceNameField")
@@ -93,6 +115,7 @@
             const profileSaveButton = document.getElementById("profileSaveButton")
             const profileLoadButton = document.getElementById("profileLoadButton")
             const profileRemoveButton = document.getElementById("profileRemoveButton")
+            const pairButton = document.getElementById("pairButton")
             const connectButton = document.getElementById("connectButton")
             const disconnectButton = document.getElementById("disconnectButton")
             const stopAdbButton = document.getElementById("stopAdbButton")
@@ -107,7 +130,19 @@
 
             ipcRenderer.send("checkDevices")
 
-            deviceInput.onkeydown = function (e) {
+            deviceIPInput.onkeydown = function (e) {
+                if (e.keyCode == 13) {
+                    pairButton.click()
+                }
+            }
+
+            devicePortInput.onkeydown = function (e) {
+                if (e.keyCode == 13) {
+                    connectButton.click()
+                }
+            }
+
+            deviceCodeInput.onkeydown = function (e) {
                 if (e.keyCode == 13) {
                     connectButton.click()
                 }
@@ -124,10 +159,14 @@
                 let selectedOption = event.target.options[event.target.selectedIndex]
                 currentProfile.name = selectedOption.getAttribute("name")
                 currentProfile.ip = selectedOption.getAttribute("value")
+                currentProfile.port = selectedOption.getAttribute("port")
+                currentProfile.code = selectedOption.getAttribute("code")
                 currentProfile.model = selectedOption.getAttribute("model")
 
                 // Do by default
-                deviceInput.value = currentProfile.ip
+                deviceIPInput.value = currentProfile.ip
+                devicePortInput.value = currentProfile.port
+                deviceCodeInput.value = currentProfile.code
 
                 if (currentProfile.name) {
                     deviceStatus.value = `Loaded profile: ${currentProfile.name}`
@@ -137,7 +176,9 @@
             profileSaveButton.addEventListener("click", () => {
                 let newDeviceProfile = {
                     name: saveInput.value,
-                    ip: deviceInput.value,
+                    ip: deviceIPInput.value,
+                    port: devicePortInput.value,
+                    code: deviceCodeInput.value,
                     model: currentDevice?.model
                 }
                 let profileIndex = currentConfig.deviceProfiles.findIndex(
@@ -175,12 +216,24 @@
                 ipcRenderer.send("refreshConfig")
             })
 
+            pairButton.addEventListener("click", () => {
+                deviceStatus.value = `Pairing...`
+
+                currentDevice.ip = deviceIPInput.value
+                currentDevice.port = devicePortInput.value
+                currentDevice.code = deviceCodeInput.value
+
+                ipcRenderer.send("pairDevice", deviceIPInput.value, devicePortInput.value, deviceCodeInput.value)
+            })
+
             connectButton.addEventListener("click", () => {
                 deviceStatus.value = `Running...`
 
-                currentDevice.ip = deviceInput.value
+                currentDevice.ip = deviceIPInput.value
+                currentDevice.port = devicePortInput.value
+                currentDevice.code = deviceCodeInput.value
 
-                ipcRenderer.send("connectDevice", deviceInput.value)
+                ipcRenderer.send("connectDevice", deviceIPInput.value, devicePortInput.value, deviceCodeInput.value)
             })
 
             disconnectButton.addEventListener("click", () => {
