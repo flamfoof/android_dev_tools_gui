@@ -54,10 +54,10 @@
                 </div>
             </div>
             <br />
-            <button id="pairButton">Pair</button>
             <button id="connectButton">Connect</button>
             <button id="disconnectButton">Disconnect</button>
             <button id="stopAdbButton">Stop ADB</button>
+            <button id="pairButton">Pair</button>
         </div>
         <div id="section">
             <p>Application</p>
@@ -66,7 +66,7 @@
             <button id="directoryButton">Browse</button>
             <p></p>
             <label for="packageField">APK Package Name:</label>
-            <input type="text" id="packageField" rows="1" cols="30" value="com.your.app" />
+            <input type="text" id="packageField" rows="1" cols="30" value="com.freecast.watch" />
             <br />
             <br />
             <button id="installButton">Install APK</button>
@@ -132,7 +132,7 @@
 
             deviceIPInput.onkeydown = function (e) {
                 if (e.keyCode == 13) {
-                    pairButton.click()
+                    connectButton.click()
                 }
             }
 
@@ -144,7 +144,7 @@
 
             deviceCodeInput.onkeydown = function (e) {
                 if (e.keyCode == 13) {
-                    connectButton.click()
+                    pair.click()
                 }
             }
 
