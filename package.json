@@ -16,7 +16,7 @@
     "apk"
   ],
   "build": {
-    "productName": "Android QA Tool",
+    "productName": "Android QA Tool Frcst",
     "appId": "com.android.qatool",
     "asar": true,
     "win": {
